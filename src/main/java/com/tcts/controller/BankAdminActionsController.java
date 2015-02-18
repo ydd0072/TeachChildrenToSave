@@ -11,8 +11,7 @@ import com.tcts.datamodel.Teacher;
 import com.tcts.datamodel.Volunteer;
 import com.tcts.exception.InvalidParameterFromGUIException;
 import com.tcts.exception.NotLoggedInException;
-import com.tcts.util.EmailUtil;
-import com.tcts.util.TemplateUtil;
+import com.tcts.util.NewEmailUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -38,10 +37,7 @@ public class BankAdminActionsController {
     private DatabaseFacade database;
 
     @Autowired
-    private TemplateUtil templateUtil;
-
-    @Autowired
-    private EmailUtil emailUtil;
+    private NewEmailUtil newEmailUtil;
 
 
     /**
@@ -113,7 +109,7 @@ public class BankAdminActionsController {
         // --- Resign from the events ---
         List<Event> events = database.getEventsByVolunteer(volunteerId);
         for (Event event : events) {
-            CancelWithdrawController.withdrawFromAnEvent(database, templateUtil, emailUtil, event, request);
+            CancelWithdrawController.withdrawFromAnEvent(database, newEmailUtil, event, request);
         }
 
         // --- Actually suspend the person ---

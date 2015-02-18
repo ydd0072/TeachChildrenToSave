@@ -1249,6 +1249,7 @@ body.errorPage .stackTrace {
 }
 
 /* --- This section for layout of the event detail page --- */
+/*                                                          */
 /*   If we wanted to use it elsewhere, we might generalize, */
 /*   but since I'm not the expert on the design I thought   */
 /*   I should keep my changes localized.                    */

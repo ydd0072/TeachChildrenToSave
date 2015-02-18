@@ -2,14 +2,15 @@ package com.tcts.controller;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.tcts.exception.EmailNotSentException;
 import com.tcts.exception.NoVolunteerOnThatEventException;
+import com.tcts.util.NewEmailUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,6 +50,9 @@ public class CancelWithdrawController {
     
     @Autowired
     private EmailUtil emailUtil;
+
+    @Autowired
+    private NewEmailUtil newEmailUtil;
 
     /**
      * A volunteer withdraws themselves from a class they had previously
@@ -123,7 +127,7 @@ public class CancelWithdrawController {
         }
 
         // --- Perform the withdraw ---
-        withdrawFromAnEvent(database, templateUtil, emailUtil, event, request);
+        withdrawFromAnEvent(database, newEmailUtil, event, request);
 
         // --- Done ---
         return "redirect:" + loggedInVolunteer.getUserType().getHomepage();
@@ -141,8 +145,7 @@ public class CancelWithdrawController {
      */
     public static void withdrawFromAnEvent(
             DatabaseFacade database,
-            TemplateUtil templateUtil,
-            EmailUtil emailUtil,
+            NewEmailUtil newEmailUtil,
             Event event,
             HttpServletRequest request
         ) throws SQLException
@@ -170,23 +173,18 @@ public class CancelWithdrawController {
 
         // --- Send Emails ---
         try {
-            Map<String,Object> emailModel = new <String, Object>HashMap();
-
-            String logoImage =  request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/tcts/img/logo-tcts.png";;
-
-            emailModel.put("logoImage", logoImage);
-            emailModel.put("to", teacherEmail);
-            emailModel.put("subject", "Your volunteer for " + new Date().toString() +" cancelled");
-            emailModel.put("class", "<br/>" + event.getEventId() + " - " + event.getEventDate() + " - " + event.getEventTime() + " - " + event.getNotes() + "<br/>");
-            // FIXME: the email should include formData.getWithdrawNotes()
-            String emailContent = templateUtil.generateTemplate("volunteerUnregisterEventToTeacher", emailModel);
-            emailUtil.sendEmail(emailContent, emailModel);
-        } catch(AppConfigurationException err) {
-            // FIXME: Need to log or report this someplace more reliable.
-            System.err.println("Could not send email for volunteer withdraw '" + teacherEmail + "'.");
-        } catch(IOException err) {
-            // FIXME: Need to log or report this someplace more reliable.
-            System.err.println("Could not send email for volunteer withdraw '" + teacherEmail + "'.");
+            Map<String,String> fieldsOfEmail = new HashMap<String,String>();
+            fieldsOfEmail.put("classDate", event.getEventDate().getPretty());
+            fieldsOfEmail.put("classTime", event.getEventTime());
+            newEmailUtil.sendEmail(
+                    "Your volunteer for " + event.getEventDate().getPretty() + " cancelled",
+                    teacherEmail,
+                    null,
+                    "volunteerUnregisterEventToTeacher",
+                    fieldsOfEmail,
+                    request);
+        } catch(EmailNotSentException err) {
+            // Can't do much about it, so we just ignore it and go on
         }
     }
 
@@ -281,8 +279,10 @@ public class CancelWithdrawController {
             	String logoImage =  request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/tcts/img/logo-tcts.png";;
         		
         		emailModel.put("logoImage", logoImage);
-            	emailModel.put("to", volunteer.getEmail());
-            	emailModel.put("subject", "Your volunteer event has been canceled.");
+//            	emailModel.put("to", volunteer.getEmail()); // FIXME: Restore
+                System.out.println("SENDING EMAIL TO mcherm@mcherm.com INSTEAD OF '" + volunteer.getEmail() + "'."); // FIXME: Remove
+                emailModel.put("to", "mcherm@mcherm.com"); // FIXME: Remove
+                emailModel.put("subject", "Your volunteer event has been canceled.");
             	emailModel.put("class", "<br/>" + event.getEventId() + " - " + event.getEventDate() + " - " + event.getEventTime() + " - " + event.getNotes() + "<br/>");
             	String singupUrl =  request.getRequestURL() + "/register.htm";
             	emailModel.put("signupLink", singupUrl);

@@ -1,15 +1,13 @@
- 
 <html>
-<body>
-<img src="${logoImage}" alt="Delaware Bankers Association logo">
+    <body>
+        <img src="${logoImage}" alt="Delaware Bankers Association logo">
 
-<p>Unfortunately, your volunteer can no longer attend the following class:</p>
-   <p>${class}</p>
-
-<p>The class has been made available on the website again so that another volunteer may sign up for it.  You�ll be notified via email when that happens.</p>
-
-
-</body>
-<p>� Copyright 2015 Teach Children to Save, Delaware.</p> 
-<p>� Created by Capital One volunteers.</p>
+        <p>
+            Unfortunately, your volunteer can no longer attend the class on ${classDate} at ${classTime}.
+        </p>
+        <p>
+            The class has been made available on the website again so that another volunteer may
+            sign up for it.  You will be notified via email when that happens.
+        </p>
+    </body>
 </html>
