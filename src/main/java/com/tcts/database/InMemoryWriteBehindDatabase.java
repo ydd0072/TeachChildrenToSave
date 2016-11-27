@@ -42,8 +42,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * An implementation of the database that is maintained entirely in memory. When updates
@@ -54,30 +56,6 @@ public class InMemoryWriteBehindDatabase implements DatabaseFacade {
 
     private final DatabaseFacade backingDB;
 
-    // === === ===
-    /*
-drop table User;
-create table User
-    (
-        user_id INT NOT NULL AUTO_INCREMENT,
-        password_salt VARCHAR(100),
-        password_hash VARCHAR(100),
-        email VARCHAR(50),
-        first_name VARCHAR(50),
-        last_name VARCHAR(50),
-        access_type VARCHAR(2) NOT NULL,
-        organization_id INT,
-        phone_number VARCHAR(45),
-        user_status INT NOT NULL,
-        reset_password_token VARCHAR(500),
-        bank_specific_data VARCHAR(500),
-        PRIMARY KEY (user_id),
-        UNIQUE KEY ix_email (email),
-        INDEX ix_organization (organization_id),
-        INDEX ix_type (access_type)
-    );
-*/
-    // === === ===
 
     private final Map<DatabaseField, Integer> fieldLengthByField;
     private final Map<String, String> siteSettings;
@@ -321,7 +299,7 @@ create table User
     }
 
     @Override
-    public BankAdmin getBankAdminByBank(String bankId) throws SQLException, NoSuchBankException {
+    public BankAdmin getBankAdminByBank(String bankId) throws SQLException {
         Bank bank = bankById.get(bankId);
         if (bank == null) {
             return null;
@@ -494,17 +472,51 @@ create table User
 
     @Override
     public SiteStatistics getSiteStatistics() throws SQLException {
-        return null;
+        int numEvents = 0;
+        int numMatchedEvents = 0;
+        int numUnmatchedEvents = 0;
+        int num3rdGradeEvents = 0;
+        int num4thGradeEvents = 0;
+        Set<Teacher> participatingTeachers = new HashSet<Teacher>();
+        Set<School> participatingSchools = new HashSet<School>();
+        for (Event event : eventById.values()) {
+            numEvents += 1;
+            if (event.getVolunteerId() == null) {
+                numUnmatchedEvents += 1;
+            }
+            else {
+                numMatchedEvents += 1;
+            }
+            if (event.getGrade().equals("3")) {
+                num3rdGradeEvents += 1;
+            }
+            else if (event.getGrade().equals("4")) {
+                num4thGradeEvents += 1;
+            }
+            participatingTeachers.add(event.getLinkedTeacher());
+            participatingSchools.add(event.getLinkedTeacher().getLinkedSchool());
+        }
+        SiteStatistics result = new SiteStatistics();
+        result.setNumEvents(numEvents);
+        result.setNumMatchedEvents(numMatchedEvents);
+        result.setNumUnmatchedEvents(numUnmatchedEvents);
+        result.setNum3rdGradeEvents(num3rdGradeEvents);
+        result.setNum4thGradeEvents(num4thGradeEvents);
+        result.setNumVolunteers(matchedVolunteers.size() + unmatchedVolunteers.size());
+        result.setNumParticipatingTeachers(participatingTeachers.size());
+        result.setNumParticipatingSchools(participatingSchools.size());
+        return result;
     }
 
     @Override
     public List<Teacher> getTeacherWithSchoolData() throws SQLException {
-        return null;
+
+        xxx;
     }
 
     @Override
     public List<Teacher> getTeachersBySchool(String schoolId) throws SQLException {
-        return null;
+        xxx;
     }
 
     @Override

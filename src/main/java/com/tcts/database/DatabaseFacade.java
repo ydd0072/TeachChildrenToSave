@@ -325,14 +325,21 @@ public interface DatabaseFacade {
 	
 	/**
 	 * Get list of all the teachers whose classes have volunteers.  If there are none returns an empty list.
+     * <p>
+     * Note: Who designed this? This is logically a mess: teachers can have multiple classes, so
+     * teachers are not "matched" or "unmatched". The existing code seems to return a list of EVENTS,
+     * with a teacher record for each event (a teacher with multiple events with volunteers would
+     * then appear multiple times on the list). The same problem exists for unmatched teachers, matched
+     * volunteers, and unmatched volunteers.
 	 * @return
 	 * @throws SQLException
 	 */
-
 	List<Teacher> getMatchedTeachers() throws SQLException;
 	
 	/**
 	 * Get list of all the teachers whose classes dont have volunteers.  If there are no teachers like this returns an empty list.
+     * <p>
+     * Note: Who designed this? See note on getMatchedTeachers()
 	 * @return
 	 * @throws SQLException
 	 */
@@ -341,6 +348,8 @@ public interface DatabaseFacade {
 	
 	/**
 	 * Get list of all the volunteers who have signed-up for classes.  If there are no volunteers returns an empty list.
+     * <p>
+     * Note: Who designed this? See note on getMatchedTeachers()
 	 * @return List<Volunteer>
 	 * @throws SQLException
 	 */
@@ -349,6 +358,8 @@ public interface DatabaseFacade {
 	
 	/**
 	 * Get list of all the volunteers who are not signed up for classes.  If there are no volunteers returns an empty list.
+     * <p>
+     * Note: Who designed this? See note on getMatchedTeachers()
 	 * @return
 	 * @throws SQLException
 	 */
