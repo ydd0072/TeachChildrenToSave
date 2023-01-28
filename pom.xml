@@ -8,7 +8,7 @@
     <name>teachchildrentosave Maven Webapp</name>
     <url>http://maven.apache.org</url>
     <properties>
-        <spring.version>5.2.20.RELEASE</spring.version>
+        <spring.version>5.2.22.RELEASE</spring.version>
         <jdk.version>1.8</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
